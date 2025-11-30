@@ -1,0 +1,7 @@
+# 核心依赖
+pyautogui
+opencv-python
+numpy
+
+# 可选依赖
+pygetwindow
