@@ -19,22 +19,30 @@ class KeyboardMouse:
         pyautogui.moveTo(x, y, duration=duration)
     
     def click_mouse(self, x=None, y=None, button='left'):
-        """点击鼠标，点击一次"""
+        """点击鼠标"""
         if x is not None and y is not None:
             print(f"点击位置: ({x}, {y})")
             # 先移动鼠标到目标位置
-            pyautogui.moveTo(x, y, duration=0.2)
+            pyautogui.moveTo(x, y, duration=0.5)
+            # 再次校准位置（有时moveTo会有微小偏差）
+            pyautogui.moveTo(x, y)
+            
             # 输出当前实际鼠标位置，用于调试
             current_pos = pyautogui.position()
             print(f"实际鼠标位置: ({current_pos[0]}, {current_pos[1]})")
-            # 点击一次
-            print("执行点击一次")
-            pyautogui.click(x, y, button=button)
+            
+            # 模拟更真实的点击：按下 -> 等待 -> 抬起
+            print("执行按下-等待-抬起操作")
+            pyautogui.mouseDown(button=button)
+            time.sleep(0.1 + (time.time() % 0.1)) # 随机微小延迟
+            pyautogui.mouseUp(button=button)
         else:
             print("点击当前位置")
-            # 点击一次
-            print("执行点击一次")
-            pyautogui.click(button=button)
+            # 模拟更真实的点击
+            print("执行按下-等待-抬起操作")
+            pyautogui.mouseDown(button=button)
+            time.sleep(0.1 + (time.time() % 0.1))
+            pyautogui.mouseUp(button=button)
     
     def wait(self, seconds):
         """等待指定秒数"""

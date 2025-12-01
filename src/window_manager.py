@@ -48,6 +48,10 @@ class WindowManager:
             windows = gw.getAllWindows()
             print(f"找到 {len(windows)} 个窗口")
             
+            # 打印所有可见窗口的标题，帮助调试
+            visible_windows = [w.title for w in windows if w.title]
+            print(f"当前可见窗口列表: {visible_windows}")
+            
             # 查找包含游戏名称的窗口
             for window in windows:
                 try:
@@ -56,8 +60,21 @@ class WindowManager:
                         for app_name in self.game_app_names:
                             if app_name.lower() in window_title.lower():
                                 print(f"找到游戏窗口: {window_title}")
+                                # 如果窗口最小化，先还原
+                                if window.isMinimized:
+                                    print("窗口已最小化，正在还原...")
+                                    window.restore()
+                                
                                 # 激活窗口
-                                window.activate()
+                                try:
+                                    window.activate()
+                                except Exception as activate_error:
+                                    print(f"直接激活窗口失败: {activate_error}，尝试最小化后还原")
+                                    # 有些情况下直接activate无效，可以尝试先最小化再还原
+                                    window.minimize()
+                                    pyautogui.sleep(0.2)
+                                    window.restore()
+                                
                                 # 等待窗口激活
                                 pyautogui.sleep(1)
                                 # 保存窗口对象和坐标
@@ -66,7 +83,7 @@ class WindowManager:
                                 print(f"游戏窗口坐标: ({window.left}, {window.top}) - ({window.right}, {window.bottom})")
                                 return True
                 except Exception as e:
-                    print(f"处理窗口失败: {e}")
+                    print(f"处理窗口 '{window.title}' 失败: {e}")
             
             print("使用pygetwindow库未找到游戏窗口")
             return False
