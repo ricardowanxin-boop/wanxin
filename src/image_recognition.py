@@ -33,10 +33,17 @@ class ImageRecognition:
                 print(f"  {template_path}")
                 return False, None, error_msg
             
-            # 加载模板图像
-            template = cv2.imread(template_path, cv2.IMREAD_COLOR)
-            if template is None:
-                error_msg = f"无法加载模板图像: {template_path}"
+            # 加载模板图像 - 处理中文路径
+            try:
+                # 使用numpy.fromfile读取文件，解决中文路径问题
+                template_data = np.fromfile(template_path, dtype=np.uint8)
+                template = cv2.imdecode(template_data, cv2.IMREAD_COLOR)
+                if template is None:
+                    error_msg = f"无法加载模板图像: {template_path}"
+                    print(f"✗ 识别失败：{error_msg}")
+                    return False, None, error_msg
+            except Exception as e:
+                error_msg = f"加载模板图像时出错: {template_path}, 错误: {e}"
                 print(f"✗ 识别失败：{error_msg}")
                 return False, None, error_msg
             
